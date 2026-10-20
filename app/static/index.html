@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deflicker Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Amber = the original (flickering light), teal = the deflickered output (steady light). */
+:root {
+  --paper: #f4f6f7; --surface: #ffffff; --ink: #151a1f; --muted: #5a6470; --rule: #d6dbe0;
+  --lamp: #b25f00; --lamp-soft: #fbead3; --steady: #0b7a70; --steady-soft: #d9f1ee; --warn: #b3261e;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", Arial, sans-serif;
+  --body: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d1114; --surface: #151b20; --ink: #e6eaee; --muted: #98a3ae; --rule: #273038;
+    --lamp: #f2a540; --lamp-soft: #3a2a12; --steady: #3fc8b8; --steady-soft: #10302d; --warn: #f07a72;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0d1114; --surface: #151b20; --ink: #e6eaee; --muted: #98a3ae; --rule: #273038;
+  --lamp: #f2a540; --lamp-soft: #3a2a12; --steady: #3fc8b8; --steady-soft: #10302d; --warn: #f07a72;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.5 var(--body); }
+button, input, select { font: inherit; color: inherit; }
+.top { display: flex; align-items: baseline; gap: 14px; padding: 18px 24px 14px; border-bottom: 1px solid var(--rule); flex-wrap: wrap; }
+.top h1 { font: 700 26px/1 var(--display); margin: 0; letter-spacing: -0.01em; }
+.top p { margin: 0; color: var(--muted); font-size: 14px; }
+.layout { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 24px; padding: 20px 24px 40px; align-items: start; }
+@media (max-width: 920px) { .layout { grid-template-columns: minmax(0, 1fr); padding: 16px; } }
+.card { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; }
+.side { display: grid; gap: 16px; position: sticky; top: 12px; }
+@media (max-width: 920px) { .side { position: static; } }
+h2 { font: 600 17px/1.2 var(--display); margin: 0 0 12px; }
+.label { font: 500 11px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 14px 0 8px; }
+.drop { border: 1.5px dashed var(--rule); border-radius: 10px; padding: 22px 14px; text-align: center; cursor: pointer;
+  transition: border-color .15s, background .15s; }
+.drop:hover, .drop.over { border-color: var(--steady); background: var(--steady-soft); }
+.drop:focus-visible { outline: 2px solid var(--steady); outline-offset: 2px; }
+.drop b { display: block; font-weight: 600; }
+.drop span { color: var(--muted); font-size: 13px; }
+.chosen { margin-top: 10px; font: 13px/1.4 var(--mono); word-break: break-all; color: var(--ink); }
+.row { display: flex; gap: 8px; align-items: center; }
+.row input[type="text"] { flex: 1; min-width: 0; padding: 8px 10px; border: 1px solid var(--rule); border-radius: 8px; background: var(--paper); }
+.seg { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: transparent; padding: 9px 8px; cursor: pointer; font-size: 13px; font-weight: 500; }
+.seg button + button { border-left: 1px solid var(--rule); }
+.seg button[aria-pressed="true"] { background: var(--steady); color: #fff; }
+.help { font-size: 12.5px; color: var(--muted); margin-top: 8px; }
+.quick { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 14px; }
+.quick input[type="number"] { width: 84px; padding: 6px 8px; border: 1px solid var(--rule); border-radius: 8px; background: var(--paper); }
+.go { margin-top: 14px; width: 100%; padding: 11px; border: 0; border-radius: 8px; background: var(--ink); color: var(--paper);
+  font-weight: 600; cursor: pointer; }
+.go:disabled { opacity: .35; cursor: default; }
+.bar { height: 6px; border-radius: 3px; background: var(--rule); overflow: hidden; margin-top: 10px; }
+.bar i { display: block; height: 100%; width: 0; background: var(--steady); transition: width .3s; }
+.msg { font-size: 13px; color: var(--warn); margin-top: 8px; min-height: 1em; }
+.jobs { display: grid; gap: 8px; }
+.job { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 10px; align-items: center; text-align: left;
+  background: transparent; border: 1px solid var(--rule); border-radius: 8px; padding: 8px; cursor: pointer; }
+.job[aria-current="true"] { border-color: var(--steady); box-shadow: inset 0 0 0 1px var(--steady); }
+.job img { width: 72px; height: 44px; object-fit: cover; border-radius: 5px; background: #000; display: block; }
+.job b { display: block; font-size: 13.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.job small { display: block; font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.lamp { color: var(--lamp); } .steady { color: var(--steady); }
+.empty { color: var(--muted); font-size: 14px; }
+.main { display: grid; gap: 16px; min-width: 0; }
+.head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.head h2 { margin: 0; font-size: 22px; word-break: break-word; }
+.chip { font: 500 12px/1 var(--mono); padding: 5px 8px; border-radius: 99px; background: var(--steady-soft); color: var(--steady); }
+.stage { position: relative; width: 100%; max-height: 72vh; background: #000; border-radius: 10px; overflow: hidden; touch-action: none; cursor: ew-resize; aspect-ratio: 16 / 9; }
+.stage canvas { display: block; width: 100%; height: 100%; }
+.stage .tag { position: absolute; top: 10px; font: 500 12px/1 var(--mono); padding: 6px 9px; border-radius: 6px; background: rgba(0,0,0,.6); color: #fff; pointer-events: none; }
+.stage .tag.l { left: 10px; border-left: 3px solid #f2a540; } .stage .tag.r { right: 10px; border-right: 3px solid #3fc8b8; }
+.stage.sbs { cursor: default; }
+.ctl { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+.ctl button { border: 1px solid var(--rule); background: var(--surface); border-radius: 7px; padding: 6px 11px; cursor: pointer; font-size: 13px; }
+.ctl button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.ctl .sp { flex: 1; }
+.ctl .fr { font: 12px var(--mono); color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 700px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.stat { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 12px 14px; }
+.stat .k { font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.stat .v { font: 600 24px/1.25 var(--display); margin-top: 6px; }
+.stat .s { font-size: 12.5px; color: var(--muted); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.actions a, .actions button { border: 1px solid var(--rule); background: var(--surface); border-radius: 8px; padding: 8px 12px;
+  text-decoration: none; cursor: pointer; font-size: 13.5px; color: var(--ink); }
+.actions .danger { color: var(--warn); }
+.progress .big { font: 600 20px/1.3 var(--display); }
+pre.log { margin: 10px 0 0; max-height: 260px; overflow: auto; background: var(--paper); border: 1px solid var(--rule); border-radius: 8px;
+  padding: 10px; font: 12px/1.45 var(--mono); white-space: pre-wrap; }
+details summary { cursor: pointer; color: var(--muted); font-size: 13px; margin-top: 10px; }
+#pool { position: fixed; left: -10px; top: 0; width: 2px; height: 2px; overflow: hidden; }
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Deflicker Lab</h1>
+  <p>Runs FlickerScope + Flicker Fusion on this computer's GPU, one clip at a time. Nothing leaves this machine.</p>
+</header>
+<div class="layout">
+  <aside class="side">
+    <section class="card" aria-labelledby="newh">
+      <h2 id="newh">New run</h2>
+      <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose a video file">
+        <b>Drop a video here</b><span>or click to choose (.mov, .mp4, …)</span>
+        <input type="file" id="file" accept="video/*,.mov,.mp4,.m4v,.mkv,.avi" hidden>
+      </div>
+      <div class="chosen" id="chosen" hidden></div>
+      <div class="label">or a file on this computer</div>
+      <div class="row"><input type="text" id="path" placeholder="path/to/clip.mov" aria-label="Path to a video file"></div>
+      <div class="label">Method</div>
+      <div class="seg" role="group" aria-label="Method">
+        <button type="button" data-method="fusion" aria-pressed="false">Flicker Fusion</button>
+        <button type="button" data-method="fusion_adaptive" aria-pressed="true">Motion-adaptive</button>
+      </div>
+      <p class="help" id="mhelp"></p>
+      <label class="quick"><input type="checkbox" id="qon" checked> Quick test: first <input type="number" id="qn" min="30" step="10" value="240" aria-label="Number of frames"> frames</label>
+      <button class="go" id="go" disabled>Run</button>
+      <div class="bar" id="ubar" hidden><i></i></div>
+      <div class="msg" id="msg" role="status"></div>
+    </section>
+    <section class="card" aria-labelledby="runsh">
+      <h2 id="runsh">Runs</h2>
+      <div class="jobs" id="jobs"><p class="empty">No runs yet.</p></div>
+    </section>
+  </aside>
+  <main class="main" id="main">
+    <div class="card empty" id="placeholder">Drop a clip on the left to start. Finished runs open here with a before / after player.</div>
+  </main>
+</div>
+<div id="pool" aria-hidden="true"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>

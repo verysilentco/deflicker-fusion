@@ -1,0 +1,42 @@
+[
+ {
+  "id": "hf_slowmo_smoke",
+  "title": "Smoker",
+  "note": "Low-key portrait, drifting smoke",
+  "before": 63.0,
+  "after": 59.4,
+  "why": "Drifting smoke changes brightness with no lamp cycle, and flow cannot track it, so there is nothing reliable to fuse from."
+ },
+ {
+  "id": "hf_timelapse_sunset",
+  "title": "Sunset",
+  "note": "Time-lapse exposure flicker",
+  "before": 25.9,
+  "after": 24.5,
+  "why": "Time-lapse: exposure jumps between shots taken seconds apart. There is no lamp cycle, and too much changes between frames to borrow light."
+ },
+ {
+  "id": "hf_timelapse_city",
+  "title": "City",
+  "note": "Time-lapse exposure flicker",
+  "before": 25.1,
+  "after": 25.2,
+  "why": "Time-lapse: exposure jumps between shots taken seconds apart. There is no lamp cycle, and too much changes between frames to borrow light."
+ },
+ {
+  "id": "hf_timelapse_night2day",
+  "title": "Snow day",
+  "note": "Time-lapse exposure flicker",
+  "before": 28.9,
+  "after": 25.6,
+  "why": "Time-lapse: exposure jumps between shots taken seconds apart. There is no lamp cycle, and too much changes between frames to borrow light."
+ },
+ {
+  "id": "hf_timelapse_snownight",
+  "title": "Snow night",
+  "note": "Time-lapse exposure flicker",
+  "before": 40.3,
+  "after": 39.6,
+  "why": "Time-lapse: exposure jumps between shots taken seconds apart. There is no lamp cycle, and too much changes between frames to borrow light."
+ }
+]

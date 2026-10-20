@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+
+# working data, outputs and third-party checkouts (never committed)
+data/
+out/
+third_party/
+clips.json
+
+# Deflicker Lab jobs (your videos and results)
+app/jobs/
+
+# rendered results page: built by bench/build_site.py + bench/make_page.py, published as the HF Space
+site/index.html
+site/media/

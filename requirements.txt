@@ -1,0 +1,9 @@
+# Python 3.10+ (developed on 3.12). Install PyTorch with CUDA for your GPU first if pip would pick a
+# CPU-only build: https://pytorch.org/get-started/locally/  (developed on torch 2.4, CUDA 12.4)
+torch>=2.1
+numpy
+opencv-python
+imageio-ffmpeg        # bundled ffmpeg binary for frame extraction and encoding
+scipy                 # imported by the RAFT code loaded from the All-In-One-Deflicker checkout
+matplotlib            # bench/scope_viz.py figures
+remotezip             # bench/fetch_dataset.py (partial download of the benchmark dataset)

@@ -1,0 +1,11 @@
+{
+  "_comment": "Copy to clips.json (git-ignored) and list your own test videos for prep.py. Relative paths are resolved against this file's folder. 'start' = first frame used (up to 200 frames are taken); 'fps' is optional (read from the file if omitted). Dataset clips (hf_slowmo_*, hf_timelapse_*) need no entry: prep.py finds them under DATA/All-In-One-Deflicker-Dataset, or under an optional \"dataset_root\": \"path/to/All-In-One-Deflicker-Dataset\" here (or DEFLICKER_DATASET).",
+  "videos": {
+    "myclip": {
+      "source": "videos/my_slowmo_clip.mov",
+      "start": 0,
+      "fps": 30.0,
+      "note": "slow-motion under LED lights"
+    }
+  }
+}

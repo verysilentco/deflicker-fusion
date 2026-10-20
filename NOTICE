@@ -1,0 +1,9 @@
+Required Notice: Copyright 2026 Silent Co, LLC (https://github.com/verysilentco/deflicker-fusion)
+
+Deflicker Fusion (FlickerScope + Flicker Fusion) is licensed under the PolyForm Noncommercial
+License 1.0.0 (see LICENSE, or https://polyformproject.org/licenses/noncommercial/1.0.0).
+Commercial use requires a separate license: contact@silent.co
+
+This repository contains no third-party code, model weights or datasets. Optical flow (RAFT), the
+All-In-One-Deflicker and Flickerformer baselines, and the benchmark clips are obtained separately;
+see THIRD_PARTY.md for sources, credits and licenses.
