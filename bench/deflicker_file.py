@@ -85,12 +85,16 @@ def encode_exact(frame_dir, pts, out_path, crf=16):
     """Encode PNG frames with their original per-frame timestamps (variable frame rate)."""
     lst = os.path.join(frame_dir, "_frames.ffconcat")
     files = frame_paths(frame_dir)
-    durs = np.diff(pts).tolist()
+    # durations from timestamps rounded to whole microseconds (what concat parses), so rounding never accumulates
+    us = np.round(np.asarray(pts, dtype=np.float64) * 1e6)
+    durs = (np.diff(us) / 1e6).tolist()
     durs.append(float(np.median(np.diff(pts))) if len(pts) > 1 else 1 / 30)
+    # Each PNG is read with a 1/90000 s time base: at the image demuxer's default (1/25 s) the durations of
+    # 240 fps frames round to zero and ffmpeg drops most frames. No repeated last entry (with ffmpeg 5+ that
+    # adds a frame); the last frame gets the median duration. The concat `option` directive needs ffmpeg 5+.
     lines = ["ffconcat version 1.0"]
     for p, d in zip(files, durs):
-        lines += [f"file '{os.path.basename(p)}'", f"duration {d:.6f}"]
-    lines.append(f"file '{os.path.basename(files[-1])}'")  # the concat demuxer needs the last file repeated
+        lines += [f"file '{os.path.basename(p)}'", "option framerate 90000", f"duration {d:.6f}"]
     with open(lst, "w") as f:
         f.write("\n".join(lines) + "\n")
     subprocess.run([FF, "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", lst, "-fps_mode", "vfr",
