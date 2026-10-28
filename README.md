@@ -7,7 +7,7 @@ motion-compensated, no training. A video deflickering method that removes flicke
 
 [Before/after demo (Hugging Face Space)](https://huggingface.co/spaces/VerySilent/deflicker-fusion) ·
 [Method write-up](METHOD.md) ·
-[iPhone app](https://apps.apple.com/app/id6790765901) ·
+[iPhone app](https://apps.apple.com/us/app/deflicker-slow-mo-flicker-fix/id6790765901) ·
 [License: PolyForm Noncommercial 1.0.0](LICENSE)
 
 ## What it is
@@ -252,7 +252,7 @@ from the published ones.
 
 ## Use it on iPhone
 
-**[Deflicker: Slow Mo Flicker Fix](https://apps.apple.com/app/id6790765901)** on the App Store fixes
+**[Deflicker: Slow Mo Flicker Fix](https://apps.apple.com/us/app/deflicker-slow-mo-flicker-fix/id6790765901)** on the App Store fixes
 flicker in your iPhone slow-motion videos. Its Fusion engine runs this method.
 
 ## FAQ
